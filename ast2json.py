@@ -14,11 +14,7 @@ def jsonify_ast(node, level=0):
         fields[k] = '...'
         v = getattr(node, k)
         if isinstance(v, ast.AST):
-            if v._fields:
-                fields[k] = jsonify_ast(v)
-            else:
-                fields[k] = classname(v)
-
+            fields[k] = jsonify_ast(v) if v._fields else classname(v)
         elif isinstance(v, list):
             fields[k] = []
             for e in v:
@@ -27,7 +23,7 @@ def jsonify_ast(node, level=0):
         elif isinstance(v, str):
             fields[k] = v
 
-        elif isinstance(v, int) or isinstance(v, float):
+        elif isinstance(v, (int, float)):
             fields[k] = v
 
         elif v is None:
@@ -36,8 +32,7 @@ def jsonify_ast(node, level=0):
         else:
             fields[k] = 'unrecognized'
 
-    ret = { classname(node): fields }
-    return ret
+    return { classname(node): fields }
 
 
 with open(sys.argv[1]) as py_file:
